@@ -47,22 +47,19 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ markdown }) => {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[[rehypeHighlight, { ignoreMissing: true }]]}
         components={{
-          code({ node, inline, className, children, ...props }) {
+          code(props) {
+            const { className, children } = props;
             const match = /language-(\w+)/.exec(className || '');
             const language = match ? match[1] : '';
             const codeString = String(children).replace(/\n$/, '');
 
             // 检测 Mermaid 代码块
-            if (language === 'mermaid' && !inline) {
+            if (language === 'mermaid') {
               return <MermaidDiagram chart={codeString} />;
             }
 
             // 普通代码块
-            return !inline ? (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            ) : (
+            return (
               <code className={className} {...props}>
                 {children}
               </code>
