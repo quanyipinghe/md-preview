@@ -65,6 +65,22 @@ pre code {
   font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
 }
 
+/* Mermaid diagram styling */
+.mermaid-diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {

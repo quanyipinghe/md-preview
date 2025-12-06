@@ -14,12 +14,39 @@ Upload a Markdown file using the file picker on the left, or drag and drop your 
 - **Syntax Highlighting**: Beautiful code blocks with syntax highlighting
 - **Drag & Drop**: Easy file upload experience
 - **Live Preview**: See your markdown rendered in real-time
+- **GFM Tables**: Full support for GitHub Flavored Markdown tables
+- **Mermaid Diagrams**: Render flowcharts, sequence diagrams, and more
+
+### Example Table
+
+| Feature | Status | Description |
+|---------|--------|-------------|
+| Tables | ✅ Supported | GitHub Flavored Markdown tables |
+| Mermaid | ✅ Supported | Flowcharts and diagrams |
+| Syntax Highlighting | ✅ Supported | Code blocks with colors |
+| Drag & Drop | ✅ Supported | Easy file upload |
+
+### Example Code Block
 
 \`\`\`javascript
 // Example code block
 function greet(name) {
   console.log(\`Hello, \${name}!\`);
 }
+\`\`\`
+
+### Example Mermaid Diagram
+
+\`\`\`mermaid
+graph TD
+    A[Upload Markdown File] --> B{Parse Content}
+    B --> C[Render Preview]
+    C --> D[Display Tables]
+    C --> E[Highlight Code]
+    C --> F[Render Mermaid]
+    D --> G[Beautiful Output]
+    E --> G
+    F --> G
 \`\`\`
 
 Start by uploading your first Markdown file!
