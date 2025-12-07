@@ -21,7 +21,7 @@ A sleek, high-performance, and visually rich Markdown previewer, built with a mo
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/md-preview.git
+    git clone https://github.com/quanyipinghe/md-preview.git
     cd md-preview
     ```
 
