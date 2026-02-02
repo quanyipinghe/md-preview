@@ -96,3 +96,63 @@ pre code {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
+
+/* 代码块复制按钮样式 */
+.code-block-wrapper {
+  position: relative;
+}
+
+.code-block-wrapper:hover .copy-btn {
+  opacity: 1;
+}
+
+.code-language-label {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  opacity: 0.8;
+  z-index: 10;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #9ca3af;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.copy-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.copy-btn.copied {
+  background-color: #22c55e;
+  color: #fff;
+  border: none;
+  opacity: 1;
+}
+
+.copy-btn-content {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.copy-icon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
