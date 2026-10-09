@@ -20,6 +20,8 @@ const FilePicker: React.FC<FilePickerProps> = ({ onFileSelect }) => {
         onFileSelect(content);
         setFileName(file.name);
         setError('');
+        // 浏览器用页面标题作为导出 PDF 的默认文件名
+        document.title = file.name.replace(/\.[^.]+$/, '');
       })
       .catch(() => setError(`读取 ${file.name} 失败`));
   }, [onFileSelect]);

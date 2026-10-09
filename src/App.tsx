@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import ExportMenu from './components/ExportMenu';
 import FilePicker from './components/FilePicker';
 import MarkdownPreview from './components/MarkdownPreview';
 
@@ -57,12 +58,12 @@ graph TD
   }, []);
 
   return (
-    <div className={`min-h-screen ${fileOpened ? 'bg-white' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
+    <div className={`min-h-screen print:bg-none ${fileOpened ? 'bg-white' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
       {/* Header: 打开文件后收成右上角的悬浮按钮 */}
       <header
         className={fileOpened
-          ? 'fixed top-3 right-4 z-20 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-md border border-gray-200 px-3 py-2'
-          : 'sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200'}
+          ? 'print:hidden fixed top-3 right-4 z-20 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-md border border-gray-200 px-3 py-2'
+          : 'print:hidden sticky top-0 z-20 bg-white shadow-sm border-b border-gray-200'}
       >
         <div className={fileOpened ? 'flex items-center gap-2' : 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4'}>
           {!fileOpened && (
@@ -87,12 +88,13 @@ graph TD
             </div>
           )}
           <FilePicker onFileSelect={handleFileSelect} />
+          <ExportMenu />
         </div>
       </header>
 
       {/* Preview Area */}
-      <main className={`${fileOpened ? 'px-6 sm:px-10 py-8' : 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
-        <div className={fileOpened ? '' : 'bg-white rounded-xl shadow-sm border border-gray-200 p-8'}>
+      <main className={`print:p-0 print:max-w-none ${fileOpened ? 'px-6 sm:px-10 py-8' : 'max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
+        <div className={fileOpened ? '' : 'bg-white rounded-xl shadow-sm border border-gray-200 p-8 print:border-0 print:shadow-none print:p-0'}>
           <MarkdownPreview markdown={markdown} />
         </div>
       </main>

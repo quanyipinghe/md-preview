@@ -148,3 +148,44 @@ pre code {
   width: 0.875rem;
   height: 0.875rem;
 }
+
+/* 导出菜单展开时铺一层透明遮罩，点击菜单外任意位置即可收起 */
+.export-menu[open] > summary::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  cursor: default;
+}
+
+/* 导出 PDF (打印) */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .copy-btn {
+    display: none;
+  }
+
+  /* 打印没有横向滚动，长代码行改为折行 */
+  pre,
+  pre code {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .mermaid-diagram,
+  tr,
+  img,
+  blockquote {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+}

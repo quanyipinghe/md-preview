@@ -10,6 +10,7 @@ A sleek, high-performance, and visually rich Markdown previewer, built with a mo
 - **GFM Tables:** GitHub Flavored Markdown tables, task lists and strikethrough via `remark-gfm`.
 - **Mermaid Diagrams:** Flowcharts, sequence diagrams and more, loaded on demand only when a document contains one.
 - **Drag & Drop:** Drop a `.md` / `.markdown` file anywhere on the page.
+- **Export:** Save the preview as PDF (via the browser print dialog), a self-contained HTML file, or a Word-compatible `.doc`.
 - **Modern Tech Stack:** Built with React, Vite, TypeScript, and Tailwind CSS for a fast and efficient development experience.
 - **Cloudflare Ready:** Optimized for easy and performant deployment on Cloudflare Pages.
 
