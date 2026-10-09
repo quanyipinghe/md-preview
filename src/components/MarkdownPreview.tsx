@@ -2,14 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import remarkGfm from 'remark-gfm';
-import mermaid from 'mermaid';
 import 'highlight.js/styles/atom-one-dark.css';
 
 interface MarkdownPreviewProps {
   markdown: string;
 }
-
-
 
 // 代码块包装组件
 interface CodeBlockWrapperProps {
@@ -19,7 +16,6 @@ interface CodeBlockWrapperProps {
 }
 
 const CodeBlockWrapper: React.FC<CodeBlockWrapperProps> = ({ language, children, rawCode }) => {
-  const preRef = useRef<HTMLPreElement>(null);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -60,39 +56,54 @@ const CodeBlockWrapper: React.FC<CodeBlockWrapperProps> = ({ language, children,
           </span>
         )}
       </button>
-      <pre ref={preRef} style={{ paddingTop: language ? '2.5rem' : undefined }}>
+      <pre style={{ paddingTop: language ? '2.5rem' : undefined }}>
         {children}
       </pre>
     </div>
   );
 };
 
+// mermaid 体积很大，只在文档里真有图表时才加载
+let mermaidPromise: Promise<typeof import('mermaid').default> | undefined;
+
+const loadMermaid = () =>
+  (mermaidPromise ??= import('mermaid').then(({ default: mermaid }) => {
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      fontSize: 16,
+      suppressErrorRendering: true
+    });
+    return mermaid;
+  }));
+
 // Mermaid 组件
 const MermaidDiagram: React.FC<{ chart: string }> = ({ chart }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (ref.current) {
-      try {
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'default',
-          securityLevel: 'loose',
-          fontSize: 16
-        });
-        const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
-        ref.current.innerHTML = '';
-        mermaid.render(id, chart).then(({ svg }) => {
-          if (ref.current) {
-            ref.current.innerHTML = svg;
-          }
-        });
-      } catch (error) {
-        if (ref.current) {
-          ref.current.innerHTML = `<pre class="text-red-600">Invalid Mermaid syntax: ${error}</pre>`;
+    let cancelled = false;
+    const id = `mermaid-${Math.random().toString(36).slice(2, 11)}`;
+
+    loadMermaid()
+      .then((mermaid) => mermaid.render(id, chart))
+      .then(({ svg }) => {
+        if (!cancelled && ref.current) {
+          ref.current.innerHTML = svg;
         }
-      }
-    }
+      })
+      .catch((error) => {
+        if (!cancelled && ref.current) {
+          const message = document.createElement('div');
+          message.className = 'text-sm text-red-600 whitespace-pre-wrap';
+          message.textContent = `Mermaid 语法错误: ${error instanceof Error ? error.message : error}`;
+          ref.current.replaceChildren(message);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [chart]);
 
   return <div ref={ref} className="mermaid-diagram my-4" />;
@@ -131,7 +142,7 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ markdown }) => {
             );
 
             const className = codeNode?.properties?.className?.join(' ') || '';
-            const match = /language-(\w+)/.exec(className);
+            const match = /language-(\S+)/.exec(className);
             const language = match ? match[1] : '';
 
             // 提取原始代码文本
@@ -146,14 +157,6 @@ const MarkdownPreview: React.FC<MarkdownPreviewProps> = ({ markdown }) => {
               <CodeBlockWrapper language={language} rawCode={rawCode}>
                 {children}
               </CodeBlockWrapper>
-            );
-          },
-          code({ className, children, ...props }) {
-            // 代码块内的 code 标签直接渲染
-            return (
-              <code className={className} {...props}>
-                {children}
-              </code>
             );
           },
         }}

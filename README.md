@@ -6,7 +6,10 @@ A sleek, high-performance, and visually rich Markdown previewer, built with a mo
 
 - **Real-Time Preview:** Instantly see your Markdown rendered as you select a local file.
 - **Publication-Quality Typography:** Beautifully styled output, powered by `@tailwindcss/typography`.
-- **Syntax Highlighting:** Elegant code blocks with syntax highlighting for a variety of languages, thanks to `highlight.js`.
+- **Syntax Highlighting:** Elegant code blocks with syntax highlighting for a variety of languages, thanks to `highlight.js`, with a one-click copy button.
+- **GFM Tables:** GitHub Flavored Markdown tables, task lists and strikethrough via `remark-gfm`.
+- **Mermaid Diagrams:** Flowcharts, sequence diagrams and more, loaded on demand only when a document contains one.
+- **Drag & Drop:** Drop a `.md` / `.markdown` file anywhere on the page.
 - **Modern Tech Stack:** Built with React, Vite, TypeScript, and Tailwind CSS for a fast and efficient development experience.
 - **Cloudflare Ready:** Optimized for easy and performant deployment on Cloudflare Pages.
 
@@ -44,6 +47,7 @@ A sleek, high-performance, and visually rich Markdown previewer, built with a mo
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Markdown Parsing:** [react-markdown](https://github.com/remarkjs/react-markdown)
 - **Syntax Highlighting:** [highlight.js](https://highlightjs.org/)
+- **Diagrams:** [Mermaid](https://mermaid.js.org/)
 
 ## ☁️ Deployment
 

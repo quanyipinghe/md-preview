@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface FilePickerProps {
   onFileSelect: (content: string) => void;
@@ -7,119 +7,102 @@ interface FilePickerProps {
 const FilePicker: React.FC<FilePickerProps> = ({ onFileSelect }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string>('');
+  const [error, setError] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File) => {
-    if (file && file.name.endsWith('.md')) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
+  const handleFile = useCallback((file: File) => {
+    if (!/\.(md|markdown)$/i.test(file.name)) {
+      setError(`不支持 ${file.name},仅支持 .md / .markdown 文件`);
+      return;
+    }
+    file.text()
+      .then((content) => {
         onFileSelect(content);
         setFileName(file.name);
-      };
-      reader.readAsText(file);
-    }
-  };
+        setError('');
+      })
+      .catch(() => setError(`读取 ${file.name} 失败`));
+  }, [onFileSelect]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       handleFile(file);
     }
+    // 清空后再次选择同一个文件才会触发 onChange
+    event.target.value = '';
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
+  // 整个页面都可以接收拖拽，避免拖偏时浏览器直接跳转打开文件
+  useEffect(() => {
+    const hasFiles = (e: DragEvent) => e.dataTransfer?.types.includes('Files');
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
+    const handleDragOver = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      setIsDragging(true);
+    };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
+    const handleDragLeave = (e: DragEvent) => {
+      // relatedTarget 为空说明拖出了窗口
+      if (e.relatedTarget === null) {
+        setIsDragging(false);
+      }
+    };
 
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleFile(file);
-    }
-  };
+    const handleDrop = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      setIsDragging(false);
 
-  const handleClick = () => {
-    fileInputRef.current?.click();
-  };
+      const file = e.dataTransfer?.files?.[0];
+      if (file) {
+        handleFile(file);
+      }
+    };
+
+    window.addEventListener('dragover', handleDragOver);
+    window.addEventListener('dragleave', handleDragLeave);
+    window.addEventListener('drop', handleDrop);
+    return () => {
+      window.removeEventListener('dragover', handleDragOver);
+      window.removeEventListener('dragleave', handleDragLeave);
+      window.removeEventListener('drop', handleDrop);
+    };
+  }, [handleFile]);
 
   return (
-    <div className="space-y-4">
-      <div
-        onClick={handleClick}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={`
-          relative border-2 border-dashed rounded-lg p-8
-          text-center cursor-pointer transition-all duration-200
-          ${isDragging
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
-          }
-        `}
+    <div className="flex items-center gap-3 min-w-0 ml-auto">
+      {error ? (
+        <span role="alert" className="text-sm text-red-600 truncate">
+          {error}
+        </span>
+      ) : fileName && (
+        <span className="text-sm text-gray-600 font-medium truncate">
+          {fileName}
+        </span>
+      )}
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".md,.markdown"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        title="也可以把文件拖到页面任意位置"
+        className="shrink-0 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-500 transition-colors"
       >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".md"
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        打开文件
+      </button>
 
-        <div className="space-y-2">
-          <svg
-            className={`mx-auto h-12 w-12 ${isDragging ? 'text-blue-500' : 'text-gray-400'}`}
-            stroke="currentColor"
-            fill="none"
-            viewBox="0 0 48 48"
-            aria-hidden="true"
-          >
-            <path
-              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-
-          <div className="text-sm text-gray-600">
-            <span className="font-semibold text-blue-600 hover:text-blue-500">
-              Click to upload
-            </span>
-            {' '}or drag and drop
-          </div>
-
-          <p className="text-xs text-gray-500">
-            Markdown files (.md) only
-          </p>
-        </div>
-      </div>
-
-      {fileName && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <svg
-            className="h-5 w-5 text-green-600"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <span className="text-sm text-green-800 font-medium truncate">
-            {fileName}
+      {isDragging && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex items-center justify-center bg-blue-50/90 border-4 border-dashed border-blue-500">
+          <span className="text-xl font-semibold text-blue-600">
+            松开以预览 Markdown 文件
           </span>
         </div>
       )}
